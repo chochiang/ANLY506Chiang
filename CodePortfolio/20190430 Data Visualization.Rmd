@@ -1,0 +1,133 @@
+---
+title: "Code Portfolio"
+subtitle: "Data Visualization"
+author: "Cho-Lin Chiang"
+date: "2019/4/30"
+output:
+  html_document:
+    number_sections: true
+    code_folding: show
+    theme: lumen
+    toc: yes
+    toc_float: TRUE
+    toc_depth: 2
+---
+
+<br> 
+
+# Introduction
+Week 7 - Data Visualization's role within Exploratory Data Analysis. 
+
+<br> 
+
+# Basic Concepts
+## Measurement Scales
+There are 4 levels of measurement scales: 
+
+1. Nominal
+
+2. Ordinal
+
+3. Interval
+
+4. Ratio
+
+<br> 
+
+## Visualization Plots
+Examples of visualization plots:
+
+1. **Bar Chart** - nominal scale. Usually x-axis is categorical data (discrete) and y-axis is numerical data (counts, proportion, percentage).
+
+2. **Frequency Histogram** - sensitive to bin placements. As a rule of thumb, 
+    i) If `n>150`, you'll need 100 bins
+    ii) If `30<n<150`, experiment with different bin numbers.
+    iii) If `n<30`, you should consider using graphs other than a frequency histogram.
+
+3. **Box Plot** - relates information such as range, quartiles, and median.
+
+<br>
+
+## Distribution Shapes
+Distribution shapes of frequency histogram can take a few forms:
+
+1. Constant
+
+2. Bell-shaped (normal distribution)
+
+3. U-shaped (bimodal)
+
+4. Constantly increasing / decreasing (linear distribution)
+
+5. Exponentially increasing (non-linear distribution)
+
+<br> 
+
+# Visualization in R
+The most common and versatile package used in R for data visualization is `ggplot2`.
+
+<br>
+
+# Practice: Chapter 5 in "R for Data Science"
+
+Using the `mpg` dataset as practice, we can create scatterplots with `geom_point`
+
+<br>
+
+```{r, warning = FALSE, message=FALSE, results="hide", echo=FALSE}
+library(ggplot2)
+library(tidyverse)
+```
+
+```{r, warning = FALSE,message=TRUE}
+ggplot(data=mpg) + geom_point(aes(x=displ, y=hwy))
+```
+This plot shows that `hwy` (highway miles per gallon) trends lower when `displ` (engine displacement) increases. 
+
+<br>
+
+There are plots that are less useful, such as this one comparing `class` and `drv` 
+```{r, warning = FALSE,message=TRUE}
+ggplot(data=mpg) + geom_point(aes(x=class, y=drv))
+```
+When we plot categorical variable to categorical variable, it doesn't tell you anything informative. There's no information of whether more midsize vehicles use front-wheel drive, or whether there is any trends since they are nominal data.
+
+<br>
+
+We can convey more information using **color**. In the following plot, `displ` is compared to `hwy`, with colors adapted to `cyl` (number of cylinders).
+
+```{r, warning = FALSE,message=TRUE}
+ggplot(data=mpg) + geom_point(aes(x=displ, y=hwy, color = cyl))
+```
+
+We can easily tell from this plot that higher `displ` usually means higher `cyl`. 
+
+<br>
+
+Other features such as `size=` and `alpha=` are helpful in determining frequency
+
+```{r, warning = FALSE,message=TRUE}
+ggplot(data=mpg) + geom_point(aes(x=displ, y=hwy, size = cyl))
+ggplot(data=mpg) + geom_point(aes(x=displ, y=hwy, alpha = cyl))
+```
+
+<br>
+
+`shape=`, on the other hand, is useful in differentiating categorical variables, such as `class`.
+
+```{r, warning = FALSE,message=TRUE}
+ggplot(data=mpg) + geom_point(aes(x=displ, y=hwy, shape = class))
+```
+
+<br>
+Trendlines can also be added to convey a clearer message
+
+```{r, warning = FALSE,message=FALSE}
+ggplot(data=mpg) + 
+  geom_point(aes(x=displ, y=hwy, color = cyl)) +
+  geom_smooth(aes(x=displ, y=hwy))
+  
+```
+
+<br>
+

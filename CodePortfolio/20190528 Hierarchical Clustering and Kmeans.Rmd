@@ -1,0 +1,97 @@
+---
+title: "Code Portfolio"
+subtitle: "Clustering - Hierarchical and K-Means"
+author: "Cho-Lin Chiang"
+date: "2019/5/28"
+output:
+  html_document:
+    number_sections: true
+    code_folding: show
+    theme: lumen
+    toc: yes
+    toc_float: TRUE
+    toc_depth: 2
+---
+
+<br> 
+
+# Introduction
+Week 11 - This class goes over the types of clustering and calculation methods in R, with a focus on K-means and Hierarchical clusterings.
+
+<br> 
+
+# Types of Clustering
+
+
+1. **Partitional Clustering** - divides data into non-overlapping subsets.
+
+2. **Hierarchical Clustering** - divides data into nested clusters organized as a hierarchical tree.
+
+<br>
+
+## K Means Clustering
+
+K Means Clustering is a method that initially chooses a number of clusters by random, and reiterate to improve the clusters. The main goal of defining clusters is to minimize intra-cluster variation.
+
+Steps:
+
+1. Randomly choose number of clusters.
+
+2. Based on (1), select the initial cluster centroid as starting points.
+
+3. Assign each data point to the cluster centroid (2) it is closest to.
+
+4. Recalculate centroids.
+
+5. Reassign clusters.
+
+6. Repeat (4) and (5)
+
+<br>
+
+## Echo Clustering
+
+Using package `factoextra` and its function `fviz_nbclust()`, stating `method = "wss"`, plot graph that shows number of clusters to total sum of squares. Find the optimal number of clusters that looks like an elbow on the graph.
+
+<br>
+
+## Silhouette Method
+
+Similar to Echo clustering, use package `factoextra` and its function `fviz_nbclust()`, stating `method = "silhouette"`, plot graph that shows number of clusters to total sum of squares. Find the number where a spike occurs.(However, this method seems to always suggest 2 as the optimal clustering number)
+
+<br>
+
+## Gap Statistic Method
+
+Using the gap function, such as `fviz_nbclust(clusters, kmeans, method = "gap_stat")+ theme_classic()`, identify the best number of clusters from the plot. 
+
+
+
+<br>
+
+# Calculating K-means in R
+
+We can use the function `kmeans()` to calculate k-means. 
+
+```{r, warning = FALSE, message=FALSE, results="hide"}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+```
+
+```{r, warning = FALSE,message=FALSE}
+df <- scale(na.omit(USArrests))
+k1 <- kmeans(df, centers = 2, nstart = 25)
+str(k1)
+```
+
+<br>
+
+We can visually plot the results with `fviz_cluster()`.
+ 
+```{r, warning = FALSE,message=FALSE}
+fviz_cluster(k1, data = df)
+```
+
+<br>
+ 

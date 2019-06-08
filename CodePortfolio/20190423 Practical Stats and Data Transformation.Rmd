@@ -1,0 +1,109 @@
+---
+title: "Code Portfolio"
+subtitle: "Practical Stats and Data Transformation"
+author: "Cho-Lin Chiang"
+date: "2019/4/23"
+output:
+  html_document:
+    number_sections: true
+    code_folding: show
+    theme: lumen
+    toc: yes
+    toc_float: TRUE
+    toc_depth: 2
+---
+
+<br> 
+
+# Introduction
+Week 6 - In this class, we went over key terminologies related to statistics, their definitions, and R functions.
+
+<br> 
+
+# Key Terminology and definition
+- **Mean** - average of a group of numbers
+- **Median** - the value in the middle of a sorted group of numbers.Can be calculated with `mad()`.
+- **Weighted mean** - sum of all values multiplied by weight, and then divided by the sum of weights. We can use the function `weighted.mean(x, w=weight)` under the package `matrixStats`.
+- **50th percentile** - similar to median
+- **Deviation** - difference between observed value and the mean
+- **Variance** - square of standard deviation
+- **Standard deviation** - calculated difference of deviation for a group of numbers. Can be calculated with `sd()`.
+
+<br> 
+
+# Practice: Chapter 5 of "R for Data Science"
+Exercise 5.2.4 Based on `nycflights13`
+
+<br>
+```{r, warning = FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)
+library(dplyr)
+library(nycflights13)
+```
+
+1. Find all flights that
+    i) Had an arrival delay of two or more hours
+
+```{r, warning = FALSE, message=TRUE}
+twohourdelay <- filter(flights, arr_delay >= 120)
+```
+    
+    ii) Flew to Houston (`IAH` or `HOU`) 
+    
+```{r, warning = FALSE, message=TRUE}
+houston <- filter(flights, dest == "IAH" | dest == "HOU")
+```
+    
+    iii) Were operated by United, American, or Delta
+    
+```{r, warning = FALSE, message=TRUE}
+carrier <- filter(flights, carrier == "UA" | carrier == "AA" | carrier == "DL")
+```
+    
+    iv) Departed in summer (July, August, and September)
+    
+```{r, warning = FALSE, message=TRUE}
+summer <- filter(flights, month %in% c(7,8,9))
+```
+    
+    v) Arrived more than two hours late, but didn¡¦t leave late 
+    
+```{r, warning = FALSE, message=TRUE}
+arrivelate <- filter(flights, arr_delay>=120 & dep_delay <=0)
+```
+   
+    vi) Were delayed by at least an hour, but made up over 30 minutes in flight 
+    
+```{r, warning = FALSE, message=TRUE}
+madeup <- filter(flights, dep_delay >=60 & arr_delay <30)
+```
+  
+    vii) Departed between midnight and 6am (inclusive)
+    
+```{r, warning = FALSE, message=TRUE}
+midnight <- filter(flights, !(dep_time > 600))
+midnight2 <- filter(flights, dep_time >= 000 & dep_time <= 600)
+```
+   
+    viii) Another useful dplyr filtering helper is `between()`. What does it do? Can you use it to simplify the code needed to answer the previous challenges?
+    
+```{r, warning = FALSE, message=TRUE}
+# Between function is a shortcut of the logical functions used previously. It simplifies the command to such as : 
+midnight3 <- filter(flights, between(flights$dep_time, 000, 600))
+```
+
+2. How many flights have a missing `dep_time`? What other variables are missing? What might these rows represent?
+
+```{r, warning = FALSE, message=TRUE}
+# Number of flights with missing dep_time
+sum(is.na(flights$dep_time))
+
+# Variables that contain missing data
+colSums(is.na(flights))
+
+# These rows may represent flights that were cancelled even though they were scheduled (in the system).
+```
+
+
+<br>
+

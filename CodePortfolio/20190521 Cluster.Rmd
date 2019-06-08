@@ -1,0 +1,59 @@
+---
+title: "Code Portfolio"
+subtitle: "Clusters"
+author: "Cho-Lin Chiang"
+date: "2019/5/21"
+output:
+  html_document:
+    number_sections: true
+    code_folding: show
+    theme: lumen
+    toc: yes
+    toc_float: TRUE
+    toc_depth: 2
+---
+
+<br> 
+
+# Introduction
+Week 10 - Clustering is a useful method to group similar data together, and each cluster should have its own extinct characteristics, i.e., one cluster should be somewhat different from another cluster. 
+
+<br> 
+
+# Segmentation Examples
+In class, we went over few types of segmentation, namely:
+
+1. **Geographical/ Spatial Segmentation** - by segmenting customers by geography, companies can set up locations where most of the customers reside to maximize revenue and/ or lower costs like delivery.
+
+2. **Customer Segmentation** - by segmenting customers by certain observed behaviors, companies can serve ads more effectively to target each group.
+
+3. **Vendor Segmentation** - by segmenting vendors by sales, companies can make more informed decision in resource allocation and optimize efficiency.
+
+<br>
+
+# Calculate "closeness"
+To determine how clustering should be done, we need to first understand the 2 major ways to calculate distance, or closeness.
+
+1. **Manhattan Distance** - `|A1 - A2| + |B1 - B2| + ... + |Z1 - Z2|`
+
+2. **Euclidean Distance** - `((a^2 + b^2)^0.5)`
+
+<br>
+
+# Calculate "closeness" in R
+We can use the function `dist()` to calculate distance, and specify the method of calculation with `"manhattan"`, `"euclidean"`, or others such as `"maximum"`, `"canberra"`, `"binary"` or `¡§minkowski¡¨`. 
+
+<br>
+
+Example:
+
+```{r, warning = FALSE, message=FALSE}
+point1 <- c(4,6,2)
+point2 <- c(1,9,3)
+matrix <- matrix(c(point1, point2), byrow = T , nrow =2)
+dist(matrix, method = "manhattan")
+dist(matrix, method = "euclidean")
+```
+
+<br>
+

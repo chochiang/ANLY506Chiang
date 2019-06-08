@@ -1,0 +1,83 @@
+---
+title: "Code Portfolio"
+subtitle: "Data Import and Transformation"
+author: "Cho-Lin Chiang"
+date: "2019/4/9"
+output:
+  html_document:
+    number_sections: true
+    code_folding: show
+    theme: lumen
+    toc: yes
+    toc_float: TRUE
+    toc_depth: 2
+---
+
+<br> 
+
+# Introduction
+Week 4 - Data cleaning and preparation take up 80% of time spent in data analysis. And tidyverse workflow suggests a framework to structuring data before any analysis takes place, that includes transforming the data with `dplyr`.
+
+<br> 
+
+# Practice: Chapter 11 of "R for Data Science"
+
+The packages needed in this class includes `tidyverse` and `dplyr`
+```{r, warning = FALSE, message=FALSE, results="hide"}
+library(tidyverse)
+library(dplyr)
+```
+
+<br>
+
+When importing dataset into R, the most common functions include `read_csv()` for csv or comma delimited files, and `read_delim()` for files with any delimiter such as `.txt`.
+<br><br>
+
+`parse_*()` functions transforms character vectors into specific formatted vector such as `parse_logical()` for logical, `parse_integer()` for integer or `parse_date()` for date.  
+
+`parse_factor()` is especially useful when you need to define categorical variables with `levels`. 
+```{r, warning = FALSE,message=TRUE}
+pets <- c("dog", "cat", "fish", "pig")
+parse_factor(c("dog", "pig", "pig"), levels = pets)
+```
+
+<br>
+
+The function `parse_datetime()` organizes an ISO8601 formatted time from the biggest to smallest:
+```{r, warning = FALSE,message=TRUE}
+parse_datetime("2010-11-30T2010")
+```
+
+<br>
+
+## Exercise 11.3.5.7
+Generate the correct format string to parse each of the following dates and times:
+```{r, warning = FALSE}
+d1 <- "January 1, 2010"
+d2 <- "2015-Mar-07"
+d3 <- "06-Jun-2017"
+d4 <- c("August 19 (2015)", "July 1 (2015)")
+d5 <- "12/30/14" # Dec 30, 2014
+t1 <- "1705"
+t2 <- "11:15:10.12 PM"
+```
+
+<br>
+
+The percentage sign `%` followed by a character defines the format of the date or time stamp.<br><br>
+For Example: <br>
+`%B` indicates month spelt in full, such as "January", "February", and "March" <br>
+`%b` indicates month shortened, such as "Jan", "Feb", and "Mar" 
+
+
+```{r, warning = FALSE}
+parse_datetime(d1, "%B %d, %Y")
+parse_datetime(d2, "%Y-%b-%d")
+parse_datetime(d3, "%d-%b-%Y")
+parse_datetime(d4, "%B %d (%Y)")
+parse_datetime(d5, "%m/%d/%y")
+parse_time(t1,"%H %M")
+parse_time(t2)
+```
+
+<br>

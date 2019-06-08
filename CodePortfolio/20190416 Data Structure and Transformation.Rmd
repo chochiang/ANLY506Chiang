@@ -1,0 +1,117 @@
+---
+title: "Code Portfolio"
+subtitle: "Data Structure and Transformation"
+author: "Cho-Lin Chiang"
+date: "2019/4/16"
+output:
+  html_document:
+    number_sections: true
+    code_folding: show
+    theme: lumen
+    toc: yes
+    toc_float: TRUE
+    toc_depth: 2
+---
+
+<br> 
+
+# Introduction
+
+Week 5 - In this class we went over the data structures of matrices and dataframe, and looked more indepth into methods of dealing with missing data.
+
+<br> 
+
+# Types of missing data
+
+There is, in general, 4 different types of missing data. <br>
+<br>
+
+1. Structurally Missing Data - is data that is missing because it doesn't exist in the first place. Take for example, a survey that collects data on smokers. If a survey respondent is not a smoker, data under "years of smoking" will be left blank since he/she doesn't smoke. To deal with this type of data, one can exclude these observations with structurally missing data.
+<br>
+
+2. Missing at Random (MAR) - is data that is missing randomly. There are ways to predict the missing data, such as using advanced imputation method like *multiple inputation* with `library(Hmisc)` and `library(missForest)`. 
+   i) `impute()` function fills missing value with with statistical methods such as mean, max, or medium. The default is median. e.g `with(data, impute(x, mean))`
+    ii) `aregImpute()` function fills missing value with additive regression, bootstrapping, and predictive mean matching. e.g. `aregImpute(~ a + b + c + d, data=data, n.impute=4)`
+<br>
+
+3. Missing Not at Random (MNAR) - is data where imputation cannot be used, largely due to the uncertainty towards probabilistic value of the missing values.
+<br> 
+
+4. Missing Completely at Randm (MCAR) - is data points being a random subset of the overall dataset.
+    i) Listwise deletion - using `na.omit(data)`
+    ii) Variable deletion - if more than 60% of the data is missing and this particular variable is not significant, observations can be omitted. 
+    iii) Pairwise deletion - preferred over listwise deletion due to the limited loss of data. It maximizes all data available. 
+
+# Data Structure Practice
+Chapter 8.7  Phillips, N. D. (2016). "Yarrr! The pirate's guide to R" https://bookdown.org/ndphillips/YaRrr/test-your-r-might-pirates-and-superheroes.html
+
+<br>
+1. Combine the data into a single dataframe. Complete all the following exercises from the dataframe!
+```{r, warning = FALSE, message=FALSE, results="hide"}
+survey <- data.frame("name" = c("Astrid","Lea","Sarina","Remon","Letizia","Babice","Jonas","Wendy","Niveditha","Gioia"),
+                     "sex" = c("F","F","F","M","F","F","M","F","F","F"),
+                     "age" = c(30,25,25,29,22,22,35,19,32,21),
+                     "superhero"=c("Batman","Superman","Batman","Spiderman","Batman","Antman","Batman","Superman","Maggott","Superman"),
+                     "tattos" = c(11, 15, 12, 5, 65, 3, 9, 13, 900, 0))
+```
+
+<br>
+
+2. What is the median age of the 10 pirates?
+```{r, warning = FALSE,message=TRUE}
+median(survey$age)
+```
+
+<br>
+
+3. What was the mean age of female and male pirates separately?
+```{r, warning = FALSE,message=TRUE}
+mean(survey$age[survey$sex=="F"])
+mean(survey$age[survey$sex=="M"])
+```
+
+<br>
+
+4. What was the most number of tattoos owned by a male pirate?
+```{r, warning = FALSE,message=TRUE}
+max(survey$tattos[survey$sex=="M"])
+```
+
+<br>
+
+5. What percent of pirates under the age of 32 were female?
+```{r, warning = FALSE, message=TRUE}
+young <- subset(x=survey, 
+                subset = age<32)
+
+table(young$sex)/sum(table(young$sex))
+```
+
+<br>
+
+6. What percent of female pirates are under the age of 32?
+```{r, warning = FALSE, message=TRUE}
+female <- subset(x=survey,
+                 subset = sex=="F")
+
+table(female$age<32)/sum(table(female$age<32))
+```
+
+<br>
+
+7. Add a new column to the dataframe called tattoos.per.year which shows how many tattoos each pirate has for each year in their life.
+```{r, warning = FALSE, message=TRUE}
+tattoos.per.year <- survey$tattos/survey$age
+newsurvey <-cbind(survey,tattoos.per.year)
+newsurvey
+```
+
+<br>
+
+8. Which pirate had the most number of tattoos per year?
+```{r, warning = FALSE, message=TRUE}
+x <- which.max(newsurvey$tattoos.per.year)
+newsurvey[x,]
+```
+
+<br>

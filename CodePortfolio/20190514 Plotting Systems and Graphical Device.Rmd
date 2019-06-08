@@ -1,0 +1,82 @@
+---
+title: "Code Portfolio"
+subtitle: "Plotting Systems and Graphical Device"
+author: "Cho-Lin Chiang"
+date: "2019/5/14"
+output:
+  html_document:
+    number_sections: true
+    code_folding: show
+    theme: lumen
+    toc: yes
+    toc_float: TRUE
+    toc_depth: 2
+---
+
+<br> 
+
+# Introduction
+
+Week 9 - Executive session - covered topics concerning the different plotting systems in R, as well as graphics devices.
+
+<br> 
+
+# Plotting Systems
+
+## Base Plotting System
+
+This plotting system comes imbedded within the original R. The defining characteristic is that plots are built from scratch, command by command. It is a cumulative process that makes going back to previous step impossible once a new command is incorporated. 
+
+
+```{r, warning = FALSE,message=FALSE}
+hist(cars$speed)
+```
+
+<br>
+
+```{r, warning = FALSE, message=FALSE, echo=FALSE}
+with(cars, plot(speed, dist)) +
+title(main = "Speed and Distance")
+```
+
+<br>
+
+## Lattice System
+
+The lattice system requires `lattice` package installation, and is most convenient when panel plots are needed (effects of *y* on *x* across levels of *z*). However, it is considered anti-intuitive because it is difficult to annotate and cannot add to plot after it has been created)
+
+```{r, warning = FALSE,message=FALSE}
+library(lattice)
+library(nycflights13)
+xyplot(arr_delay~ air_time | month, data=flights, layout=c(4,3))
+```
+
+<br>
+
+# Graphics Devices
+
+Graphics devices are devices that make plots appear. And, plotting graphs in R, you'd come across the different devices:
+
+1. window (type of device: screen)
+
+2. PDF (type of device: file)
+
+3. PNG/ JPEG (type of device: file)
+
+4. Scalable Vector Graphics (SVG) (type of device: file)
+
+
+
+```{r, warning = FALSE,message=FALSE}
+
+```
+
+<br>
+
+```{r, warning = FALSE,message=FALSE}
+
+```
+
+<br>
+
+
