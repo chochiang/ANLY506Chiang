@@ -1,0 +1,288 @@
+---
+title: "Final Report"
+author: "Cho-Lin Chiang"
+date: "2019/6/15"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+  html_document:
+    code_folding: hide
+    number_sections: yes
+    theme: lumen
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+subtitle: Gapminder database
+---
+
+<br> 
+
+# Introduction - Gapminder Database
+
+Gapminder is a dataset containing 41,284 observations and 6 variables, including `country`, the recorded `year`, `life` (or life expectancy), `population` (census data collected approximately every 10 years), `income` (or GDP per capita), and `region`. `Country` and `region` are factor variables with 197 and 6 levels respectively. `Year` is a continuous interval variable, while `life`, `population` and `income` are continuous variables.
+
+<br>
+
+Taking a deeper dive into the dataset, this dataset contains information from 1800 up to 2015. `life` expectancy ranged from 1.00 to 84.10 years. `population` ranged from 1,548 to 1.3 billion. `income` ranged from 142 up to 182,668. 
+
+<br>
+
+```{r, warning = FALSE, message=FALSE, results="hide"}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(zoo)
+library(plotly)
+library(gridExtra)
+
+gm <- read.csv("C:/Users/PC01/Desktop/ANLY506 EDA/FinalReport/gapminder.csv", na.strings=c("","NA"))
+options(scipen = 9999)
+str(gm)
+
+#summary
+summary(gm)
+```
+
+<br>
+
+# Data Wrangling and Cleaning
+
+Data wrangling and cleaning are required. Since the same population was applied every 10 years in some countries (Afghanistan), there are missing values that need to be filled in with `na.locf()`. Next, `population` was incorrectly labeled as a factor variable, and this needs to be adjusted with the `as.numeric()` function. It should be noted that while the spectrum for `population` is large, I will be scaling this variable within the plots with the function `scale_x_log10()` in `ggplot2`.
+
+```{r, warning = FALSE, message=FALSE, results="hide"}
+gm$population <- na.locf(gm$population)
+gm$population <- as.numeric(as.character(gm$population))
+```
+
+<br>
+
+# Exploratory Questions
+
+For my exploratory questions, I will focus on 3 main questions and observe trends and relationship within 3 main variables, `income`, `population`, and `life` expectancy.
+
+<br>
+
+- **Does GDP per capita growth across regions happen around the same period?** - Although overall growth in GDP per capita did infact start after 1920, the majority of growth experienced across region happen in different periods for each region, possibly due to specific economic events such as oil boom, trade embargo, etc.
+
+- **Is there an obvious relationship between population and life expectancy?** - There is a strong positive relationship between population and life expectacy. As population grows, life expectancy also improves, possibly due to better healthcare technology and education.
+
+- **Cluster Analysis** - Using divisive hierarchical clustering and gap statistical method, it is determined that the optimal number of clusters is 10.
+
+
+
+<br> 
+
+## GDP per Capita
+
+**Does GDP per capita growth across regions happen around the same period? **
+
+<br>
+
+For this initial question, we will start exploring with faceted graphs by mapping `income` by `year` for every `region`. 
+
+```{r, warning = FALSE, message=FALSE}
+#color-blind friendly palette
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+#plot
+ggplot(gm,aes(x=Year, y=income, group=region, color=region))+
+  geom_line() + 
+  facet_wrap( ~ region, ncol =2) +
+  labs(title = "GDP per Capita by Region (Year 1800 - 2015)",
+       y = "GDP per Capita") +
+  theme_bw()+
+  theme(legend.position="none") + 
+  scale_fill_manual(values=cbPalette)
+```
+
+
+This first graph shows considerable growth across in GDP per Capita all regions except `South Asia` and `Sub-Saharan Africa` in 1920. To take a closer look, we can filter out data before the year 1920, and only look at Years 1920 - 2015 and the 4 regions with higher growth. 
+
+<br>
+
+```{r, warning = FALSE, message=FALSE}
+
+gmincome <- subset(gm, Year > 1920)
+gmincome2 <- subset(gmincome, 
+                    region == "America" | 
+                    region == "East Asia & Pacific" |
+                    region == "Europe & Central Asia" |
+                    region == "Middle East & North Africa" )
+
+ggplot(gmincome2,aes(x=Year, y=income, group=region, color=region))+
+  geom_line(size=0.1) + 
+  facet_wrap( ~ region, ncol = 2) +
+  labs(title = "GDP per Capita by Region (Year 1920 - 2015)",
+       y = "GDP per Capita") +
+  theme_bw() +
+  theme(legend.position="bottom") + 
+  scale_fill_manual(values = cbPalette)
+```
+
+Taking a closer look, we can see that `America` and `Europe & Central Asia` experienced a gradual increase in GDP per Capita year over year. On the other hand, `East Asia & Pacific` had an exponential increase from 1940 to 1950, after which growth reached a plateau until it peaked around 1980. `Middle East & North Africa` paints a vastly different picture, with a sharp increase around 1970s, which may be explained by the oil boom in Middle Eastern economies. 
+
+<br>
+
+We can also look at GDP per capita in specific years. I'm interested in comparing the years 1980 and 2015, to look at whether there are obvious trends on the country-level. 
+
+```{r, warning = FALSE, message=FALSE}
+# boxplot 1980 vs 2015
+gmincome3 <- subset(gm, Year == 1980)
+gmincome4 <- subset(gm, Year == 2015)
+
+box1 <- ggplot(gmincome3,aes(x=region, y=income, color = region))+
+  geom_boxplot(width=0.5, fill="lightblue", line="grey") +
+  geom_jitter(alpha=0.5, width = 0.1)  + 
+  theme_bw() + 
+  labs(title="GDP per Capita, Year 1980",
+       x = "Region",
+       y = "GDP per Capita") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none") +
+  scale_fill_manual(cbPalette)
+
+box2 <- ggplot(gmincome4,aes(x=region, y=income, color = region))+
+  geom_boxplot(width=0.5, fill="lightblue", line="grey") +
+  geom_jitter(alpha=0.5, width = 0.1) + 
+  ylim(0,180000)+
+  theme_bw() +
+  labs(title="GDP per Capita, Year 2015",
+       x = "Region") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title.y = element_blank(),
+        legend.position = "none") +
+  scale_fill_manual(cbPalette)
+
+grid.arrange(box1, box2, nrow=1)
+
+```
+
+Across most regions, there is an increase in spread in GDP per Capita distribution with the exception of `Middle East & North Africa`, possibly due to a surge in inflation during the 1980s. Within `Europe & Central Asia` specifically, the 25th to 75th percentile experienced a considerable upward shift, indicating great economic growth. The points plotted on the graph also shows that where most countries cluster around similar GDP per capita in 1980, they began spreading out into a wider spectrum as seen from the more dispersed points plotted in the year 2015. 
+
+<br>
+
+## Population
+
+**Is there an obvious relationship between population and life expectancy?**
+
+For the second exploratory question, we will use a scatterplot to show whether there is a relationship between these two variables in 1980 and 2015.
+
+```{r, warning = FALSE, message=FALSE}
+
+# Pop vs Life Exp Year 1980
+ggplot(gmincome3, aes(x=population, y=life, color=region)) +
+  geom_jitter(alpha = 0.5, size = 3) +
+  scale_x_log10() +
+  labs(title = "Relationship between Population & Life Expectancy by Region (Year 1980)",
+       y = "Life Expectancy",
+       x = "Population(log10)") +
+  scale_fill_manual(values = cbPalette) +
+  theme_bw()
+
+# Pop vs Life Exp Year 2015
+ggplot(gmincome4, aes(x=population, y=life, color=region)) +
+  geom_jitter(alpha = 0.5, size = 3) +
+  scale_x_log10() +
+  labs(title = "Relationship between Population & Life Expectancy by Region (Year 2015)",
+       y = "Life Expectancy",
+       x = "Population(log10)") +
+  scale_fill_manual(values = cbPalette) +
+  theme_bw()
+```
+
+
+By comparing the relationship between `population` and `life` expectancy in 1980 and 2015, we can see that there is a trend with increased life expectancy and population size (the effects of population differences are scaled down because of the log10 function). It should be noted that overall life expectancy has improved, represented by the upward shift of data points below 50 years of age towards 60 years. 
+
+<br>
+
+
+## Cluster Analysis
+
+**Divisive Hierarchical Clustering on 2015 datapoints from `gapminder`.**
+
+```{r, warning = FALSE, message=FALSE, results="hide"}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(dendextend)
+```
+
+<br>
+
+First, we will compute divisive hierarchical clustering with function `diana`. The coefficient computed was 0.97, extremely close to 1, which inidicates a fairly strong clustering structure. 
+
+```{r, warning = FALSE, message=FALSE, results="hide"}
+#2015
+cluster <- gmincome4
+cluster2 <- cluster[,-1]
+cluster2 <- cluster[,-1:-2]
+cluster3 <- cluster2[,-4]
+rownames(cluster3) <- cluster[,1]
+cluster4 <- na.omit(cluster3)
+cluster4 <- data.frame(scale(cluster4))
+
+# computer divisive hc with diana
+hc <- diana(cluster4)
+
+# Option to divise coefficient; amount of clustering structure found (hc$dc)
+```
+
+To determine the optimal number of clusters for our divisive hierarchical clustering method, we will look at both silhouette and elbow method.
+
+```{r, warning = FALSE, message=FALSE}
+# number of clusters
+c1 <- fviz_nbclust(cluster4, kmeans, method = "silhouette") + 
+  geom_vline(xintercept=2) + 
+  labs(title = "Silhouette Method")
+
+c2 <- fviz_nbclust(cluster4, kmeans, method = "wss") + 
+  geom_vline(xintercept=4) + 
+  labs(title = "Elbow Method")
+
+c3 <- fviz_nbclust(cluster4, kmeans, method = "gap_stat") + 
+  geom_vline(xintercept=10) + 
+  labs(title = "Gap Stat Method")
+
+grid.arrange(c1, c2, c3, nrow=1)
+```
+
+Since gap statistics usually outperforms other methods, and that the optimal number of clusters is the maximum of the gap statistics, we will use 10 as the optimal number of clusters.
+
+<br>
+
+
+```{r, warning = FALSE, message=FALSE}
+# plot dendogram
+pltree(hc, cex = 0.1, hang = -1, main = "Dendogram of diana")
+rect.hclust(hc, k = 10, border = 2:5)
+```
+
+The heigher the height of the fusion, the more dissimilar are the observations.
+We can also use `fviz_cluster` to visualize this result.
+
+```{r, warning = FALSE, message=FALSE}
+subgrp <- cutree(hc, k=10)
+
+fviz_cluster(list(data = cluster4, cluster=subgrp)) + 
+  ylim(-2, 0.9) +
+  xlim(-2.2, 4) +
+  theme(legend.position="none") + 
+  theme_bw()
+
+```
+
+
+<br>
+
+# Summary
+
+Across all region, overall growth in GDP per capita started after 1920, with the majority of growth occuring in different periods for each region. More analysis can be done in matching GDP data to certain economic boosting events such as an oil boom, or trade events to create a correlation map.
+
+<br> 
+
+While there is a strong positive relationship between population and life expectacy, it seems that certain region still lags behind other regions especially in life expectancy.
+
+<br>
+<br>
+ 

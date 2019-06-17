@@ -17,4 +17,4 @@ This folder contains notes on main learning concepts on the topic of Exploratory
 
 ### Final Project
 
-- soon to be updated - 
+The final project pertains an exploratory data analysis on a database called "gapminder". This is a database where data on population, GDP per capita, and life expectancy in each country and region are collected. The EDA final project includes an analysis on (1) GDP per capita across region, (2) the relationship between population and life expectancy, and (3) cluster analysis using divisive hierarchical clustering. 
