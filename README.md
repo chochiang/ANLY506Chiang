@@ -14,6 +14,8 @@ This folder contains notes on main learning concepts on the topic of Exploratory
 20190528 - Hierarchical Clustering and Kmeans <br>
 
 
+--------------------------------------------------------------------------------------------
+
 
 ### Final Project
 
